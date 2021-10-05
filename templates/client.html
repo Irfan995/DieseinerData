@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Client {% endblock title %}
+{% block content %}
+<div class="content d-flex justify-content-center">
+    <div class="col-md-4 align-items-center" style="margin-top: 5%;">
+        <h3 style="text-align: center;">Welcome to DieseinerData!</h3>
+        <div class="horizontal-line"></div>
+        <div class="row pt-3 pb-3 " style="margin-top: 10%; margin-bottom: 10%">
+            <div class="col-sm-6 text-center">
+                <button id="signup-btn" class="btn outline-green">SIGN UP</button>
+            </div>
+            <div class="col-sm-6 text-center">
+                <button id="login-btn" class="btn outline-green">LOGIN</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+{{block.super}}
+<script type="text/javascript">
+    $(document).ready(function () {
+        redirectSignup();
+        redirectLogin();
+    })
+
+    function redirectSignup() {
+        $("#signup-btn").click(function () {
+            window.location.href = "https://dieseinerdata.com/auth/signup/";
+        })
+    }
+
+    function redirectLogin() {
+        $("#login-btn").click(function () {
+            window.location.href = "https://dieseinerdata.com/auth/login/";
+        })
+    }
+</script>
+{% endblock javascripts %}

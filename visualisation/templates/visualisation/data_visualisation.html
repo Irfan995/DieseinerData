@@ -1,0 +1,620 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Data Visualisation {% endblock title %}
+
+{% block stylesheets %}
+{{block.super}}
+<script src="{% static 'vendors/plotly/plotly-latest.min.js' %}"></script>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="visual-content col-sm-12 col-md-12 col-lg-12">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Data visualisation</h3>
+        </div>
+        <div class="col-md-6 text-end">
+            <button id="import-btn" class="btn btn-grey" data-toggle="modal"
+                data-target="upload-data-modal">Import</button>
+        </div>
+    </div>
+    <div class="horizontal-line"></div>
+    <div class="text-center" id="no-data-msg" style="display: none">
+        <h4>No visualisation available. Please import data to see visualisation.</h4>
+    </div>
+    <div class="tab">
+        <button id="radio-log-tab" class="tablinks" onclick="">RADIO LOGS</button>
+        <button id="jail-population-tab" class="tablinks" onclick="">JAIL POPULATION</button>
+    </div>
+    <div class="text-center tabcontent" id="no-data-msg" style="display: none">
+        <h4>No visualisation available. Please import data to see visualisation.</h4>
+    </div>
+    <div class="row content tabcontent" id='plot'>
+        <div class="col-md-3">
+            <div class="row">
+                <h6>Select Unit Shift</h6>
+            </div>
+            <div class="row">
+                <div class="col d-flex justify-content-start">
+                    <button attr-click="false" id="a-shift-btn" class="btn btn-grey unit-shift-btn">A</button>
+                    <button attr-click="false" id="b-shift-btn" class="btn btn-grey unit-shift-btn">B</button>
+                    <button attr-click="false" id="c-shift-btn" class="btn btn-grey unit-shift-btn">C</button>
+                </div>
+            </div>
+            <div class="row">
+                <h6>Select Unit</h6>
+            </div>
+            <div class="row">
+                <div class="col d-flex justify-content-start">
+                    <button attr-click="false" id="a1-btn" class="btn btn-grey unit-btn">A1</button>
+                    <button attr-click="false" id="a11-btn" class="btn btn-grey unit-btn">A11</button>
+                    <button attr-click="false" id="a3-btn" class="btn btn-grey unit-btn">A3</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col d-flex justify-content-start">
+                    <button attr-click="false" id="a10-btn" class="btn btn-grey unit-btn">A10</button>
+                    <button attr-click="false" id="a4-btn" class="btn btn-grey unit-btn">A4</button>
+                    <button attr-click="false" id="b1-btn" class="btn btn-grey unit-btn">B1</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col d-flex justify-content-start">
+                    <button attr-click="false" id="b10-btn" class="btn btn-grey unit-btn">B10</button>
+                    <button attr-click="false" id="b11-btn" class="btn btn-grey unit-btn">B11</button>
+                    <button attr-click="false" id="b2-btn" class="btn btn-grey unit-btn">B2</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col d-flex justify-space-between">
+                    <button attr-click="false" id="b3-btn" class="btn btn-grey unit-btn">B3</button>
+                    <button attr-click="false" id="c10-btn" class="btn btn-grey unit-btn">C10</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div id="tencode-usage-donut-chart" style="width:500px;height:420px;"></div>
+            <div class="horizontal-line"></div>
+            <div id="avg-min-spent-tencode" style="width:500px;height:450px;"></div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <h6>Select Tencode</h6>
+            </div>
+            <div class="col d-flex justify-content-center">
+                <button attr-click="false" id="enrt-btn" class="btn btn-grey tencode-btn">ENRT</button>
+                <button attr-click="false" id="arrvd-btn" class="btn btn-grey tencode-btn">ARRVD</button>
+                <button attr-click="false" id="ajail-btn" class="btn btn-grey tencode-btn">AJAIL</button>
+                <button attr-click="false" id="cmplt-btn" class="btn btn-grey tencode-btn">CMPLT</button>
+            </div>
+        </div>
+    </div>
+    <div class="row content tabcontent" id="plot-population" style="display: none;">
+        <div class="col-md-12">
+            <div id="jail-population-chart"></div>
+        </div>
+    </div>
+    <div class="loading-spinner-overlay" id="loading-spinner" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner-grow" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="upload-data-modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Data File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Choose a CSV / Excel file to upload data.</p>
+                <div class="container">
+                    <form id="data-import-form" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" id="data-import" name="data-file" style="display:none" />
+                    </form>
+                    <button id="data-import-btn" class="btn btn-grey">Choose a file</button>
+                </div>
+                <br>
+                <div class="progress">
+                    <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25"
+                        aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                <div id='file-upload-loader' style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <strong class="text-info">Loading...</strong>
+                        <div class="spinner-border ms-auto spinner-border-sm text-info" role="status"
+                            aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <br>
+                <h5><strong>**Attention**</strong></h5>
+                <h6>Please download a file format to import data</h6>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-5">
+                        <div class="row" style="margin-right: 1px;">
+                            <button id="csv-import-example" class="btn btn-outline-info btn-sm" type="button"
+                                name="button" style="margin-bottom: 2px;">CSV - Radio Logs</button>
+                            <button id="excel-import-example" class="btn btn-outline-info btn-sm" type="button"
+                                name="button" >XLSX - Radio Logs</button>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="row" style="margin-right: 1px;">
+                            <button id="csv-import-example-jail" class="btn btn-outline-info btn-sm" type="button"
+                                name="button" style="margin-bottom: 2px;">CSV - Jail Population</button>
+                            <button id="excel-import-example-jail" class="btn btn-outline-info btn-sm" type="button"
+                                name="button">XLSX - Jail Population</button>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <h6><b>N.B.</b> Please use the given on Unit and Unit Shift</h6>
+
+                <table id="radio-log-example" class="table table-bordered table-sm" style="display: none;">
+                    <thead>
+                        <tr style="color: #73879C; font-size: 10px">
+                            <th class="py-2">unit</th>
+                            <th class="py-2">logdate</th>
+                            <th class="py-2">unit_shift</th>
+                            <th class="py-2">tencode</th>
+                            <th class="py-2">Avg_Min</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="font-size: 10px">
+                            <td><span>A1</span></td>
+                            <td><span>08/01/2020</span></td>
+                            <td><span>A</span></td>
+                            <td><span>ENRT</span></td>
+                            <td><span>15</span></td>
+                        </tr>
+                        <tr style="font-size: 10px">
+                            <td><span>A11</span></td>
+                            <td><span>08/02/2020</span></td>
+                            <td><span>A</span></td>
+                            <td><span>ARRVD</span></td>
+                            <td><span>30</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table id="jail-population-example" class="table table-bordered table-sm" style="display: none;">
+                    <thead>
+                        <tr style="color: #73879C; font-size: 10px">
+                            <th class="py-2">Date</th>
+                            <th class="py-2">Count Population</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="font-size: 10px">
+                            <th class="py-2">08/02/2020</th>
+                            <th class="py-2">9</th>
+                        </tr>
+                        <tr style="font-size: 10px">
+                            <th class="py-2">08/03/2020</th>
+                            <th class="py-2">5</th>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+{{block.super}}
+<script src="{% static 'vendors/export-excel/src/jquery.table2excel.js' %}"></script>
+<script src="{% static 'vendors/export-csv/js/tableHTMLExport.js' %}"></script>
+<script type="text/javascript">
+    var unitList = []
+    var tencodeList = []
+
+    $(document).ready(function () {
+        plotData(unitList, tencodeList);
+        plotJailPopulationData()
+        plotAvgSpentTencode()
+
+        $('#radio-log-tab').addClass('active')
+    })
+
+    // Export files
+    $("#excel-import-example").click(function () {
+        $("#radio-log-example").table2excel({
+            filename: "data-template",
+            fileext: ".xls"
+        })
+    })
+
+    $("#csv-import-example").click(function () {
+        $("#radio-log-example").tableHTMLExport({
+            type: "csv",
+            filename: "data-template.csv"
+        });
+    })
+    $("#excel-import-example-jail").click(function () {
+        $("#jail-population-example").table2excel({
+            filename: "data-template",
+            fileext: ".xls"
+        })
+    })
+
+    $("#csv-import-example-jail").click(function () {
+        $("#jail-population-example").tableHTMLExport({
+            type: "csv",
+            filename: "data-template.csv"
+        });
+    })
+
+    $('#data-import-btn').click(function () {
+        $('#data-import').trigger('click');
+    });
+
+    $("#import-btn").click(function () {
+        $("#upload-data-modal").modal('show')
+    })
+    // Unit shift selection button click
+    $('.unit-shift-btn').click(function () {
+        var unitShiftList = []
+        var isClicked = $(this).attr('attr-click')
+
+        if (isClicked === 'true') {
+            $(this).attr('attr-click', 'false')
+            buttonResetStyle(this)
+        } else {
+            $(this).attr('attr-click', 'true')
+            buttonClickedStateStyle(this)
+        }
+
+        $('.unit-shift-btn').each(function () {
+            if ($(this).attr('attr-click') === 'true') {
+                unitShiftList.push($(this).html())
+            }
+        })
+
+        $('#a1-btn').attr('disabled', true)
+        $('#a11-btn').attr('disabled', true)
+        $('#a3-btn').attr('disabled', true)
+        $('#a10-btn').attr('disabled', true)
+        $('#a4-btn').attr('disabled', true)
+        $('#b1-btn').attr('disabled', true)
+        $('#b2-btn').attr('disabled', true)
+        $('#b3-btn').attr('disabled', true)
+        $('#b10-btn').attr('disabled', true)
+        $('#b11-btn').attr('disabled', true)
+        $('#c10-btn').attr('disabled', true)
+
+        var a = unitShiftList.includes('A')
+        var b = unitShiftList.includes('B')
+        var c = unitShiftList.includes('C')
+        if (a) {
+            $('#a1-btn').attr('disabled', false)
+            $('#a11-btn').attr('disabled', false)
+            $('#a3-btn').attr('disabled', false)
+            $('#a10-btn').attr('disabled', false)
+            $('#a4-btn').attr('disabled', false)
+        }
+        if (b) {
+            $('#b1-btn').attr('disabled', false)
+            $('#b2-btn').attr('disabled', false)
+            $('#b3-btn').attr('disabled', false)
+            $('#b10-btn').attr('disabled', false)
+            $('#b11-btn').attr('disabled', false)
+        }
+        if (c) {
+            $('#c10-btn').attr('disabled', false)
+        }
+    })
+
+    $('.tablinks').click(function () {
+        var clickedButtonValue = $(this).html()
+        if (clickedButtonValue === 'RADIO LOGS') {
+            $('#plot').show()
+            $('#plot-population').hide()
+            $('#radio-log-tab').addClass('active')
+            $('#jail-population-tab').removeClass('active')
+        } else {
+            plotJailPopulationData()
+            $('#plot-population').show()
+            $('#plot').hide()
+            $('#radio-log-tab').removeClass('active')
+            $('#jail-population-tab').addClass('active')
+        }
+    })
+
+    // Unit selection button click
+    $('.unit-btn').click(function () {
+        var unitList = []
+        var isClicked = $(this).attr('attr-click')
+
+        if (isClicked === 'true') {
+            $(this).attr('attr-click', 'false')
+            buttonResetStyle(this)
+        } else {
+            $(this).attr('attr-click', 'true')
+            buttonClickedStateStyle(this)
+        }
+
+        $('.unit-btn').each(function () {
+            if ($(this).attr('attr-click') === 'true') {
+                unitList.push($(this).html())
+            }
+        })
+        plotData(unitList, tencodeList)
+    })
+
+    // Tencode selection button click
+    $('.tencode-btn').click(function () {
+        var tencodeList = []
+        var isClicked = $(this).attr('attr-click')
+
+        if (isClicked === 'true') {
+            $(this).attr('attr-click', 'false')
+            buttonResetStyle(this)
+        } else {
+            $(this).attr('attr-click', 'true')
+            buttonClickedStateStyle(this)
+        }
+
+        $('.tencode-btn').each(function () {
+            if ($(this).attr('attr-click') === 'true') {
+                tencodeList.push($(this).html())
+            }
+        })
+        plotData(unitList, tencodeList)
+    })
+
+    // Add style when button is clicked
+    function buttonClickedStateStyle(id) {
+        $(id).addClass('btn-grey-clicked');
+        $(id).removeClass('btn-grey');
+    }
+
+    // Reset button style when button is reset
+    function buttonResetStyle(id) {
+        $(id).removeClass('btn-grey-clicked');
+        $(id).addClass('btn-grey');
+
+    }
+
+    $('#data-import-form').change(function (e) {
+        e.preventDefault();
+        var dataFile = new FormData($('#data-import-form').get(0));
+        dataFile.append('data-file', $('#data-import')[0].files);
+        $('#file-upload-loader').show();
+        $.ajax({
+            url: '{% url "visualisation:data-upload" %}',
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function (ev) {
+                    if (ev.lengthComputable) {
+                        console.log('Bytes Loaded: ' + ev.loaded);
+                        console.log('Total Size: ' + ev.total);
+                        console.log('Percentage Loaded: ' + (ev.loaded / ev.total) * 100 + '%');
+
+                        var percent = Math.round((ev.loaded / ev.total) * 100);
+                        $("#progress-bar").attr("aria-valuenow", percent).css("width", percent + "%").text(percent + "%");
+                    }
+                });
+                return xhr;
+            },
+            type: 'POST',
+            // headers: {
+            //     "X-CSRFToken": '{{ csrf_token }}'
+            // },
+            data: dataFile,
+            dataType: 'json',
+            success: function (data) {
+
+                // Reset input form
+                $('#data-import-form').each(function () {
+                    this.reset();
+                });
+                if (data) {
+                    $('#file-upload-loader').hide();
+                    if (data.status === 201) {
+                        setTimeout(function () {
+                            alert('Data successfully uploaded!');
+                        }, 500);
+                        $("#progress-bar").attr("aria-valuenow", 0).css("width", 0 + "%").text(0 + "%");
+                        $("#upload-data-modal").modal('hide');
+
+                    } else if (data.status === 403) {
+                        alert('Data upload failed! Please check the format.')
+                        $("#progress-bar").attr("aria-valuenow", 0).css("width", 0 + "%").text(0 + "%");
+                        $("#upload-data-modal").modal('hide');
+
+                    }
+                }
+            },
+            cache: false,
+            processData: false,
+            contentType: false,
+        })
+    })
+
+    function plotData(unitList, tencodeList) {
+        $("#loading-spinner").show();
+        $.ajax({
+            url: '{% url "visualisation:plot-data" %}',
+            type: 'GET',
+            data: {
+                'unit_list': JSON.stringify(unitList),
+                'tencode_list': JSON.stringify(tencodeList)
+            },
+            dataType: 'json',
+            success: function (data) {
+                $("#loading-spinner").hide();
+                if (data.response === 200) {
+                    $("#plot").show();
+                    $('#no-data-msg').hide();
+                    var enrt = data.enrt_usage_percent;
+                    var arrvd = data.arrvd_usage_percent;
+                    var ajail = data.ajail_usage_percent;
+                    var cmplt = data.cmplt_usage_percent;
+
+                    var data = [{
+                        values: [enrt, arrvd, ajail, cmplt],
+                        labels: ['ENRT', 'ARRVD', 'AJAIL', 'CMPLT'],
+                        domain: { column: 0 },
+                        name: 'Tencode Usage',
+                        hoverinfo: 'label+percent+name',
+                        hole: .4,
+                        type: 'pie'
+                    }];
+
+                    var layout = {
+                        title: 'Tencode Usage in %',
+                        annotations: [
+                            {
+                                font: {
+                                    size: 20
+                                },
+                                showarrow: false,
+                                text: 'Usage',
+                                x: 0.5,
+                                y: 0.5
+                            }
+                        ],
+                        // height: 400,
+                        width: 600,
+                        showlegend: true,
+                        grid: { rows: 1, columns: 1 }
+                    };
+                    Plotly.newPlot('tencode-usage-donut-chart', data, layout);
+                } else {
+                    $("#plot").hide();
+                    $('#no-data-msg').show();
+                }
+            }
+        })
+    }
+
+    function plotAvgSpentTencode() {
+        $.ajax({
+            url: '{% url "visualisation:plot-avg-tencode-spent" %}',
+            type: 'GET',
+            data: {
+
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data) {
+                    var a1AvgSpentTime = data.a1_avg_time_spent;
+                    var a11AvgSpentTime = data.a11_avg_time_spent;
+                    var a3AvgSpentTime = data.a3_avg_time_spent;
+                    var a10AvgSpentTime = data.a10_avg_time_spent;
+                    var a4AvgSpentTime = data.a4_avg_time_spent;
+                    var b1AvgSpentTime = data.b1_avg_time_spent;
+                    var b2AvgSpentTime = data.b2_avg_time_spent;
+                    var b3AvgSpentTime = data.b3_avg_time_spent;
+                    var b10AvgSpentTime = data.b10_avg_time_spent;
+                    var b11AvgSpentTime = data.b11_avg_time_spent;
+                    var c10AvgSpentTime = data.c10_avg_time_spent;
+
+                    var barData = [{
+                        type: 'bar',
+                        x: [a1AvgSpentTime, a11AvgSpentTime, a3AvgSpentTime, a10AvgSpentTime, a4AvgSpentTime, b1AvgSpentTime, b2AvgSpentTime, b3AvgSpentTime, b10AvgSpentTime, b11AvgSpentTime, c10AvgSpentTime],
+                        y: ['A1', 'A11', 'A3', 'A4', 'A10', 'B1', 'B2', 'B3', 'B10', 'B11', 'C10'],
+                        orientation: 'h'
+                    }];
+
+                    var barLayout = {
+                        title: 'Average Minutes Spent on Tencode',
+                        barmode: 'stack',
+                        xaxis: {
+                            title: 'MINUTES',
+                            titlefont: {
+                                family: 'Arial, sans-serif',
+                                size: 14,
+                                color: 'black'
+                            },
+                            showticklabels: true,
+                            tickangle: 'auto',
+                            tickfont: {
+                                family: 'Old Standard TT, serif',
+                                size: 14,
+                                color: 'black'
+                            },
+                            exponentformat: 'e',
+                            showexponent: 'all'
+                        },
+                        yaxis: {
+                            title: 'UNIT',
+                            titlefont: {
+                                family: 'Arial, sans-serif',
+                                size: 14,
+                                color: 'black'
+                            },
+                            showticklabels: true,
+                            tickangle: 0,
+                            tickfont: {
+                                family: 'Old Standard TT, serif',
+                                size: 14,
+                                color: 'black'
+                            },
+                            exponentformat: 'e',
+                            showexponent: 'all'
+                        }
+                    };
+                    Plotly.newPlot('avg-min-spent-tencode', barData, barLayout);
+                }
+            }
+        })
+    }
+
+    function plotJailPopulationData() {
+        $("#loading-spinner").show();
+        $.ajax({
+            url: '{% url "visualisation:plot-jail-population-data" %}',
+            type: 'GET',
+            data: {
+
+            },
+            dataType: 'json',
+            success: function (data) {
+                $("#loading-spinner").hide();
+
+                if (data) {
+                    $('#no-data-msg').hide()
+                    if (data.status === 200) {
+                        console.log('here');
+                        var trace = {
+                            x: data.date,
+                            y: data.count_population,
+                            type: 'scatter'
+                        };
+                        var data = [trace];
+                        var layout = {
+                            title: 'Jail Population Per Day',
+                            xaxis: {
+                                title: 'Year',
+                                showgrid: false,
+                                zeroline: false
+                            },
+                            yaxis: {
+                                title: 'Jail Population Count',
+                                showline: false
+                            }
+                        }
+
+                        Plotly.newPlot('jail-population-chart', data, layout);
+                    }
+                } else {
+                    $('#no-data-msg').show()
+                }
+            }
+        })
+    }
+</script>
+{% endblock javascripts %}

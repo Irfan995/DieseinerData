@@ -1,0 +1,19 @@
+{% load static %}
+<div class="navbar row justify-content-between mb-0">
+    <div class="col-md-4">
+        <a href="{% url 'home' %}"><img src="{% static 'images/logo_footer.png'%}"
+                style="height:100px; width:300px;"></a>
+
+    </div>
+    <div class="col-md-8">
+        <ul class="nav justify-content-end">
+            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">HOME</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'what-we-do' %}">WHAT WE DO</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'portfolio' %}">PORTFOLIO</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">CONTACT</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'reviews' %}">REVIEWS</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'teams' %}">TEAMS</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'client' %}">CLIENT</a></li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %} Contact {% endblock title %}
+{% block content %}
+<div class="content container">
+  <div class="box">
+    <h3>Contact</h3>
+    <h5>Telephone : <span>305-814-0827</span></h5>
+    <form action="" class="col justify-content-center">
+      <div class="item form-group">
+        <label class="col-form-label col-md-4 col-sm-4 col-xs-12 label-align">Your Name <span
+            class="required">(required)</span>
+        </label>
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          <input type="text" name="name" class="form-control" required>
+        </div>
+      </div>
+      <div class="item form-group">
+        <label class="col-form-label col-md-4 col-sm-4 col-xs-12 label-align">Your Email <span
+            class="required">(required)</span>
+        </label>
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          <input type="email" name="Email" class="form-control" required>
+        </div>
+      </div>
+      <div class="item form-group">
+        <label class="col-form-label col-md-4 col-sm-4 col-xs-12 label-align">Subject
+        </label>
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          <input type="text" name="subject" class="form-control" required>
+        </div>
+      </div>
+      <div class="item form-group">
+        <label class="col-form-label col-md-4 col-sm-4 col-xs-12 label-align">Your Message
+        </label>
+        <div class="col-md-9 col-sm-9 col-xs-12">
+          <textarea name="" id="" cols="30" rows="10" class="form-control"></textarea>
+        </div>
+      </div>
+      <button type="button" class="btn btn-success">Send</button>
+    </form>
+  </div>
+
+</div>
+
+{% endblock content %}
