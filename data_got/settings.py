@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'data_got.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'data_got',
+        'NAME': 'dieseiner_data',
         'USER': 'postgres',
         'PASSWORD': 'SuperSecretPassword',
         'HOST': 'localhost',
@@ -141,7 +141,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
 
-LOGIN_REDIRECT_URL = 'http://localhost:8888/visualisation/data-visualisation/'
+LOGIN_REDIRECT_URL = 'https://dieseinerdata.com/visualisation/data-visualisation/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
