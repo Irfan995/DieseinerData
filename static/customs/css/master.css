@@ -21,6 +21,11 @@
   font-size: large;
 }
 
+.navbar-nav>.active>a {
+  background-color: #C0C0C0;
+  color: green;
+}
+
 .footer-logo {
   padding: 30px 0px 30px 20px;
   background-color: #262626;
