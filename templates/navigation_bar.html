@@ -1,19 +1,41 @@
 {% load static %}
-<div class="navbar row justify-content-between mb-0">
-    <div class="col-md-4">
-        <a href="{% url 'home' %}"><img src="{% static 'images/logo_footer.png'%}"
-                style="height:100px; width:300px;"></a>
-
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="navbar">
+    <div class="container-fluid">
+        <div class="col col-sm-3 col-md-5">
+            <a href="{% url 'home' %}"><img src="{% static 'images/logo_footer.png'%}"
+                    style="height:100px; width:300px;"></a>
+        </div>
+        <div class="" style="text-align: end;"">
+            <button class=" navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent" style="margin-top: 10px;">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="text-align: end;">
+                    <li class="nav-item"><a attr-click="false" class="nav-link" href="{% url 'home' %}">HOME</a></li>
+                    <li class="nav-item"><a attr-click="false" class="nav-link" href="{% url 'what-we-do' %}">WHAT WE
+                            DO</a></li>
+                    <li class="nav-item"><a attr-click="false" class="nav-link"
+                            href="{% url 'portfolio' %}">PORTFOLIO</a></li>
+                    <li class="nav-item"><a attr-click="false" class="nav-link" href="{% url 'contact' %}">CONTACT</a>
+                    </li>
+                    <li class="nav-item"><a attr-click="false" class="nav-link" href="{% url 'reviews' %}">REVIEWS</a>
+                    </li>
+                    <li class="nav-item"><a attr-click="false" class="nav-link" href="{% url 'teams' %}">TEAM</a></li>
+                    <li class="nav-item"><a attr-click="false" class="nav-link" href="{% url 'client' %}">CLIENTS</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-    <div class="col-md-8">
-        <ul class="nav justify-content-end">
-            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">HOME</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'what-we-do' %}">WHAT WE DO</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'portfolio' %}">PORTFOLIO</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">CONTACT</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'reviews' %}">REVIEWS</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'teams' %}">TEAMS</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'client' %}">CLIENT</a></li>
-        </ul>
-    </div>
-</div>
+</nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $('ul.navbar-nav > li')
+        .click(function (e) {
+            $('ul.navbar-nav > li')
+                .removeClass('active');
+            $(this).addClass('active');
+        });
+</script>
