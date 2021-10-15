@@ -219,3 +219,7 @@
 .rating-star {
   color: #249c82;
 }
+
+.label-align {
+  text-align: end;
+}
