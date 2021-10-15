@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.http import JsonResponse, response
 import pandas as pd
-from core.models import JailPopulation, Unit
+from core.models import JailPopulation, SupplyData, Unit
 
 
 def sec_to_min(seconds):
@@ -39,6 +39,7 @@ class VisualisationView(DetailView):
         name = f'{client_user_object.last_name}, {client_user_object.first_name}'
 
         context['client_name'] = name
+        context['client_id'] = client.id
 
         return context
 
@@ -81,7 +82,8 @@ class DataUpload(View):
                 count_population = data_df.loc[i, 'Count Population']
 
                 if pd.notnull(date) and pd.notnull(count_population):
-                    jail_populations = JailPopulation.objects.filter(user=user, date=date, count_population=count_population)
+                    jail_populations = JailPopulation.objects.filter(
+                        user=user, date=date, count_population=count_population)
                     jail_populations.delete()
                     JailPopulation.objects.create(
                         user=user,
@@ -100,7 +102,8 @@ class PlotData(View):
         user = self.request.user
         unit_list = json.loads(request.GET.get('unit_list', ''))
         if len(unit_list) == 0:
-            unit_list = ['A1', 'A11', 'A3', 'A4', 'A10', 'B10', 'B11', 'B1', 'B2', 'B3', 'C10']
+            unit_list = ['A1', 'A11', 'A3', 'A4', 'A10',
+                         'B10', 'B11', 'B1', 'B2', 'B3', 'C10']
         tencode_list = json.loads(request.GET.get('tencode_list', ''))
         # data = []
         usage_data = {}
@@ -265,44 +268,52 @@ class PlotAverageTencodeSpent(View):
 
         if unit_a10_logs:
             for log in unit_a10_logs:
-                total_tencode_time_a10 = total_tencode_time_a10 + float(log.tencode_complete_time)
+                total_tencode_time_a10 = total_tencode_time_a10 + \
+                    float(log.tencode_complete_time)
             a10_avg_time_spent = total_tencode_time_a10 / unit_a10_logs.count()
 
         if unit_a4_logs:
             for log in unit_a4_logs:
-                total_tencode_time_a4 = total_tencode_time_a4 + float(log.tencode_complete_time)
+                total_tencode_time_a4 = total_tencode_time_a4 + \
+                    float(log.tencode_complete_time)
             a4_avg_time_spent = total_tencode_time_a4 / unit_a4_logs.count()
 
         if unit_b1_logs:
             for log in unit_b1_logs:
-                total_tencode_time_b1 = total_tencode_time_b1 + float(log.tencode_complete_time)
+                total_tencode_time_b1 = total_tencode_time_b1 + \
+                    float(log.tencode_complete_time)
             b1_avg_time_spent = total_tencode_time_b1 / unit_b1_logs.count()
 
         if unit_b2_logs:
             for log in unit_b2_logs:
-                total_tencode_time_b2 = total_tencode_time_b2 + float(log.tencode_complete_time)
+                total_tencode_time_b2 = total_tencode_time_b2 + \
+                    float(log.tencode_complete_time)
             b2_avg_time_spent = total_tencode_time_b2 / unit_b2_logs.count()
 
         if unit_b3_logs:
             for log in unit_b3_logs:
-                total_tencode_time_b3 = total_tencode_time_b3 + float(log.tencode_complete_time)
+                total_tencode_time_b3 = total_tencode_time_b3 + \
+                    float(log.tencode_complete_time)
             b3_avg_time_spent = total_tencode_time_b3 / unit_b3_logs.count()
 
         if unit_b10_logs:
             for log in unit_b10_logs:
-                total_tencode_time_b10 = total_tencode_time_b10 + float(log.tencode_complete_time)
+                total_tencode_time_b10 = total_tencode_time_b10 + \
+                    float(log.tencode_complete_time)
             b10_avg_time_spent = total_tencode_time_b10 / unit_b10_logs.count()
 
         if unit_b11_logs:
             for log in unit_b11_logs:
-                total_tencode_time_b11 = total_tencode_time_b11 + float(log.tencode_complete_time)
+                total_tencode_time_b11 = total_tencode_time_b11 + \
+                    float(log.tencode_complete_time)
             b11_avg_time_spent = total_tencode_time_b11 / unit_b11_logs.count()
 
         if unit_c10_logs:
             for log in unit_c10_logs:
-                total_tencode_time_c10 = total_tencode_time_c10 + float(log.tencode_complete_time)
+                total_tencode_time_c10 = total_tencode_time_c10 + \
+                    float(log.tencode_complete_time)
             c10_avg_time_spent = total_tencode_time_c10 / unit_c10_logs.count()
-                
+
         return JsonResponse({'a1_avg_time_spent': a1_avg_time_spent,
                              'a11_avg_time_spent': a11_avg_time_spent,
                              'a3_avg_time_spent': a3_avg_time_spent,
@@ -314,6 +325,40 @@ class PlotAverageTencodeSpent(View):
                              'b10_avg_time_spent': b10_avg_time_spent,
                              'b11_avg_time_spent': b11_avg_time_spent,
                              'c10_avg_time_spent': c10_avg_time_spent})
+
+
+class UploadSupplierData(View):
+    def post(self, request):
+        user = self.request.user
+
+        user = self.request.user
+        data_file = request.FILES['data-file']
+
+        if data_file.name.endswith('.csv'):
+            data_df = pd.read_csv(data_file)
+        elif data_file.name.endswith('.xls') or data_file.name.endswith('.xlsx'):
+            data_df = pd.read_excel(data_file)
+        for i in range(len(data_df)):
+            supplier_name = data_df.loc[i, 'Supplier Name']
+            paid_year = data_df.loc[i, 'Paid Date FY Year']
+            total_net_amount = data_df.loc[i, 'Total Net Amount']
+
+            if pd.notnull(supplier_name) and pd.notnull(paid_year) and pd.notnull(total_net_amount):
+                suppliers = SupplyData.objects.filter(
+                    user=user, supplier_name=supplier_name, paid_year=paid_year, total_net_amount=total_net_amount)
+
+                suppliers.delete()
+
+                SupplyData.objects.create(
+                    user=user,
+                    supplier_name=supplier_name,
+                    paid_year=paid_year,
+                    total_net_amount=total_net_amount
+                )
+                status = 201
+            else:
+                status = 403
+        return JsonResponse({'status': status})
 
 
 class PlotJailPopulation(View):
@@ -334,5 +379,36 @@ class PlotJailPopulation(View):
             status = 401
 
         return JsonResponse({'date': date, 'count_population': count_population, 'status': status})
-        
-        
+
+
+class FetchSupplierName(View):
+    def get(self, request):
+        client_id = request.GET.get('client_id', None)
+
+        user = User.objects.get(id=client_id)
+        data = []
+        if user:
+            suppliers = SupplyData.objects.filter(
+                user=user).distinct('supplier_name')
+            print(suppliers.count())
+            for supplier in suppliers:
+                data.append({
+                    'supplier_name': supplier.supplier_name
+                })
+            print(data)
+        return JsonResponse(data, safe=False)
+
+
+class FetchSupplierData(View):
+    def get(self, request):
+        supplier_name = request.GET.get('supplier_name', None)
+
+        supplier_datas = SupplyData.objects.filter(supplier_name=supplier_name)
+        data = []
+        for supplier_data in supplier_datas:
+            data.append({
+                'paid_year': supplier_data.paid_year,
+                'total_net_amount': supplier_data.total_net_amount
+            })
+        print(data)
+        return JsonResponse(data, safe=False)
