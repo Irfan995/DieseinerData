@@ -177,8 +177,8 @@
 }
 
 .team {
-  width: 300px;
-  height: 300px;
+  width: 100%;
+  height: 50%;
 }
 
 .team-img {
@@ -186,6 +186,34 @@
   height: 100%;
   width: 100%;
   /* border-radius: 50%; */
+}
+
+.team-column {
+  float: left;
+  width: 50%;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+@media screen and (max-width: 650px) {
+  .team-column {
+    width: 100%;
+    display: block;
+  }
+}
+
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.container {
+  padding: 0 16px;
+}
+
+.container::after, .row::after {
+  content: "";
+  clear: both;
+  display: table;
 }
 
 .rating-star {
