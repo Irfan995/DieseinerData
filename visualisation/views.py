@@ -347,7 +347,7 @@ class UploadSupplierData(View):
                 suppliers = SupplyData.objects.filter(
                     user=user, supplier_name=supplier_name, paid_year=paid_year, total_net_amount=total_net_amount)
 
-                suppliers.delete()
+                # suppliers.delete()
 
                 SupplyData.objects.create(
                     user=user,
