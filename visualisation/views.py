@@ -63,9 +63,9 @@ class DataUpload(View):
                 tencode_complete_time = data_df.loc[i, 'Avg_Min']
 
                 if pd.notnull(name) and pd.notnull(log) and pd.notnull(shift) and pd.notnull(tencode) and pd.notnull(tencode_complete_time):
-                    logs = Unit.objects.filter(
-                        name=name, log=log, shift=shift, tencode=tencode, tencode_complete_time=tencode_complete_time, user=user)
-                    logs.delete()
+                    # logs = Unit.objects.filter(
+                    #     name=name, log=log, shift=shift, tencode=tencode, tencode_complete_time=tencode_complete_time, user=user)
+                    # logs.delete()
                     Unit.objects.create(
                         name=name,
                         log=log,
