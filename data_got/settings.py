@@ -142,7 +142,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
 
 
-LOGIN_REDIRECT_URL = 'http://localhost:8000/visualisation/data-visualisation/'
+LOGIN_REDIRECT_URL = 'https://www.dieseinerdata.com/visualisation/data-visualisation/'
 
 
 # Default primary key field type
