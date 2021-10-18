@@ -51,6 +51,8 @@ class SupplyData(models.Model):
     paid_year = models.CharField(max_length=128, null=True, blank=True)
     total_net_amount = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True)
+    rank = models.IntegerField(null=True, blank=True)
+    bin = models.CharField(max_length=128, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.supplier_name

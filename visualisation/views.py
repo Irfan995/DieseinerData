@@ -329,6 +329,7 @@ class PlotAverageTencodeSpent(View):
 
 class UploadSupplierData(View):
     def post(self, request):
+        SupplyData.objects.all().delete()
         user = self.request.user
 
         user = self.request.user
@@ -338,14 +339,17 @@ class UploadSupplierData(View):
             data_df = pd.read_csv(data_file)
         elif data_file.name.endswith('.xls') or data_file.name.endswith('.xlsx'):
             data_df = pd.read_excel(data_file)
+
         for i in range(len(data_df)):
             supplier_name = data_df.loc[i, 'Supplier Name']
             paid_year = data_df.loc[i, 'Paid Date FY Year']
             total_net_amount = data_df.loc[i, 'Total Net Amount']
+            rank = data_df.loc[i, 'Rank Sum']
+            bin = data_df.loc[i, 'Bin Rank Sum']
 
-            if pd.notnull(supplier_name) and pd.notnull(paid_year) and pd.notnull(total_net_amount):
+            if pd.notnull(supplier_name) and pd.notnull(paid_year) and pd.notnull(total_net_amount) and pd.notnull(rank) and pd.notnull(bin):
                 suppliers = SupplyData.objects.filter(
-                    user=user, supplier_name=supplier_name, paid_year=paid_year, total_net_amount=total_net_amount)
+                    user=user, supplier_name=supplier_name, paid_year=paid_year, total_net_amount=total_net_amount, rank=rank, bin=bin)
 
                 # suppliers.delete()
 
@@ -353,11 +357,14 @@ class UploadSupplierData(View):
                     user=user,
                     supplier_name=supplier_name,
                     paid_year=paid_year,
-                    total_net_amount=total_net_amount
+                    total_net_amount=total_net_amount,
+                    rank=rank,
+                    bin=bin
                 )
                 status = 201
             else:
                 status = 403
+            print(status)
         return JsonResponse({'status': status})
 
 
@@ -408,7 +415,9 @@ class FetchSupplierData(View):
         for supplier_data in supplier_datas:
             data.append({
                 'paid_year': supplier_data.paid_year,
-                'total_net_amount': supplier_data.total_net_amount
+                'total_net_amount': supplier_data.total_net_amount,
+                'rank': supplier_data.rank,
+                'bin': supplier_data.bin
             })
         print(data)
         return JsonResponse(data, safe=False)

@@ -110,7 +110,7 @@
     <div class="text-center" id="no-data-msg" style="display: none">
         <h4>No visualisation available. Please import data to see visualisation.</h4>
     </div>
-    <div class="row">
+    <div class="row mt-3 ">
         <label class="col-form-label col-md-4 col-sm-4 label-align">Select Supplier</label>
         <div class="col-md-4 col-sm-4">
             <select class="custom-select form-select" name="supplier-name-select">
@@ -118,26 +118,30 @@
             </select>
         </div>
     </div>
-    <div class="row d-flex justify-content-center" style="margin-top: 10px;">
-        <u>
-            <h5 id="supplier-name" style="text-align: center; padding: 10px;"></h5>
-        </u>
-    </div>
-    <div class="row d-flex justify-content-center" style="margin-top: 10px;">
-        <div class="col-md-6 col-sm-8">
-            <table class="table table-sm table-striped">
-                <thead>
-                    <tr>
-                        <th>Paid Date FY Year</th>
-                        <th>Total Net Amount</th>
-                    </tr>
-                </thead>
-                <tbody id="supplier-data">
-                    <tr id="no-data-available">
-                        <td colspan="2" style="text-align: center;">No data available</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="border mt-3 ms-3 me-3 p-2">
+        <div class="row d-flex justify-content-center" style="margin-top: 10px;">
+            <u>
+                <h5 id="supplier-name" style="text-align: center; padding: 10px;"></h5>
+            </u>
+        </div>
+        <div class="row d-flex justify-content-center" style="margin-top: 10px;">
+            <div class="col-md-6 col-sm-8">
+                <table class="table table-sm table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Paid Date FY Year</th>
+                            <th>Total Net Amount</th>
+                            <th>Rank Sum</th>
+                            <th>Bin Rank Sum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supplier-data">
+                        <tr id="no-data-available">
+                            <td colspan="4" style="text-align: center;">No data available</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     {% endif %}
@@ -879,6 +883,8 @@
                             `<tr>
                                 <td>${data[i].paid_year}</td>
                                 <td>${data[i].total_net_amount}</td>
+                                <td>${data[i].rank}</td>
+                                <td>${data[i].bin}</td>
                             </tr>`
                         )
                     }
