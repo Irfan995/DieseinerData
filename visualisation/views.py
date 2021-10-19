@@ -63,9 +63,10 @@ class DataUpload(View):
                 tencode_complete_time = data_df.loc[i, 'Avg_Min']
 
                 if pd.notnull(name) and pd.notnull(log) and pd.notnull(shift) and pd.notnull(tencode) and pd.notnull(tencode_complete_time):
-                    logs = Unit.objects.filter(
-                        name=name, log=log, shift=shift, tencode=tencode, tencode_complete_time=tencode_complete_time, user=user)
-                    logs.delete()
+                    if Unit.objects.filter(name=name, log=log, shift=shift, tencode=tencode, tencode_complete_time=tencode_complete_time, user=user):
+                        logs = Unit.objects.filter(
+                            name=name, log=log, shift=shift, tencode=tencode, tencode_complete_time=tencode_complete_time, user=user)
+                        logs.delete()
                     Unit.objects.create(
                         name=name,
                         log=log,
@@ -82,9 +83,10 @@ class DataUpload(View):
                 count_population = data_df.loc[i, 'Count Population']
 
                 if pd.notnull(date) and pd.notnull(count_population):
-                    jail_populations = JailPopulation.objects.filter(
-                        user=user, date=date, count_population=count_population)
-                    jail_populations.delete()
+                    if JailPopulation.objects.filter(user=user, date=date, count_population=count_population):
+                        jail_populations = JailPopulation.objects.filter(
+                            user=user, date=date, count_population=count_population)
+                        jail_populations.delete()
                     JailPopulation.objects.create(
                         user=user,
                         date=date,
@@ -329,7 +331,6 @@ class PlotAverageTencodeSpent(View):
 
 class UploadSupplierData(View):
     def post(self, request):
-        SupplyData.objects.all().delete()
         user = self.request.user
 
         user = self.request.user
@@ -348,10 +349,11 @@ class UploadSupplierData(View):
             bin = data_df.loc[i, 'Bin Rank Sum']
 
             if pd.notnull(supplier_name) and pd.notnull(paid_year) and pd.notnull(total_net_amount) and pd.notnull(rank) and pd.notnull(bin):
-                suppliers = SupplyData.objects.filter(
-                    user=user, supplier_name=supplier_name, paid_year=paid_year, total_net_amount=total_net_amount, rank=rank, bin=bin)
+                if SupplyData.objects.filter(user=user, supplier_name=supplier_name, paid_year=paid_year, total_net_amount=total_net_amount, rank=rank, bin=bin):
+                    suppliers = SupplyData.objects.filter(
+                        user=user, supplier_name=supplier_name, paid_year=paid_year, total_net_amount=total_net_amount, rank=rank, bin=bin)
 
-                # suppliers.delete()
+                    suppliers.delete()
 
                 SupplyData.objects.create(
                     user=user,
