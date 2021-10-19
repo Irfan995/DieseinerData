@@ -9,6 +9,7 @@
 
 {% block content %}
 <div class="visual-content col-sm-12 col-md-12 col-lg-12">
+    {% if client_id == 1 or client_id == 2 %}
     <div class="row">
         <div class="col-md-6">
             <h3>Data visualisation</h3>
@@ -22,6 +23,7 @@
     <div class="text-center" id="no-data-msg" style="display: none">
         <h4>No visualisation available. Please import data to see visualisation.</h4>
     </div>
+
     <div class="tab">
         <button id="radio-log-tab" class="tablinks" onclick="">RADIO LOGS</button>
         <button id="jail-population-tab" class="tablinks" onclick="">JAIL POPULATION</button>
@@ -94,6 +96,55 @@
             <div id="jail-population-chart"></div>
         </div>
     </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Data visualisation</h3>
+        </div>
+        <div class="col-md-6 text-end">
+            <button id="import-supplier-data-btn" class="btn btn-grey" data-toggle="modal"
+                data-target="upload-data-modal">Import</button>
+        </div>
+    </div>
+    <div class="horizontal-line"></div>
+    <div class="text-center" id="no-data-msg" style="display: none">
+        <h4>No visualisation available. Please import data to see visualisation.</h4>
+    </div>
+    <div class="row mt-3 ">
+        <label class="col-form-label col-md-4 col-sm-4 label-align">Select Supplier</label>
+        <div class="col-md-4 col-sm-4">
+            <select class="custom-select form-select" name="supplier-name-select">
+                <option value="None">-- Select any --</option>
+            </select>
+        </div>
+    </div>
+    <div class="border mt-3 ms-3 me-3 p-2">
+        <div class="row d-flex justify-content-center" style="margin-top: 10px;">
+            <u>
+                <h5 id="supplier-name" style="text-align: center; padding: 10px;"></h5>
+            </u>
+        </div>
+        <div class="row d-flex justify-content-center" style="margin-top: 10px;">
+            <div class="col-md-6 col-sm-8">
+                <table class="table table-sm table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Paid Date FY Year</th>
+                            <th>Total Net Amount</th>
+                            <th>Rank Sum</th>
+                            <th>Bin Rank Sum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supplier-data">
+                        <tr id="no-data-available">
+                            <td colspan="4" style="text-align: center;">No data available</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="loading-spinner-overlay" id="loading-spinner" style="display: none;">
         <div class="loading-spinner">
             <div class="spinner-grow" role="status">
@@ -142,7 +193,116 @@
                             <button id="csv-import-example" class="btn btn-outline-info btn-sm" type="button"
                                 name="button" style="margin-bottom: 2px;">CSV - Radio Logs</button>
                             <button id="excel-import-example" class="btn btn-outline-info btn-sm" type="button"
-                                name="button" >XLSX - Radio Logs</button>
+                                name="button">XLSX - Radio Logs</button>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="row" style="margin-right: 1px;">
+                            <button id="csv-import-example-jail" class="btn btn-outline-info btn-sm" type="button"
+                                name="button" style="margin-bottom: 2px;">CSV - Jail Population</button>
+                            <button id="excel-import-example-jail" class="btn btn-outline-info btn-sm" type="button"
+                                name="button">XLSX - Jail Population</button>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <h6><b>N.B.</b> Please use the given on Unit and Unit Shift</h6>
+
+                <table id="radio-log-example" class="table table-bordered table-sm" style="display: none;">
+                    <thead>
+                        <tr style="color: #73879C; font-size: 10px">
+                            <th class="py-2">unit</th>
+                            <th class="py-2">logdate</th>
+                            <th class="py-2">unit_shift</th>
+                            <th class="py-2">tencode</th>
+                            <th class="py-2">Avg_Min</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="font-size: 10px">
+                            <td><span>A1</span></td>
+                            <td><span>08/01/2020</span></td>
+                            <td><span>A</span></td>
+                            <td><span>ENRT</span></td>
+                            <td><span>15</span></td>
+                        </tr>
+                        <tr style="font-size: 10px">
+                            <td><span>A11</span></td>
+                            <td><span>08/02/2020</span></td>
+                            <td><span>A</span></td>
+                            <td><span>ARRVD</span></td>
+                            <td><span>30</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table id="jail-population-example" class="table table-bordered table-sm" style="display: none;">
+                    <thead>
+                        <tr style="color: #73879C; font-size: 10px">
+                            <th class="py-2">Date</th>
+                            <th class="py-2">Count Population</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="font-size: 10px">
+                            <th class="py-2">08/02/2020</th>
+                            <th class="py-2">9</th>
+                        </tr>
+                        <tr style="font-size: 10px">
+                            <th class="py-2">08/03/2020</th>
+                            <th class="py-2">5</th>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="upload-supplier-data-modal" tabindex="-1" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Data File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Choose a CSV / Excel file to upload data.</p>
+                <div class="container">
+                    <form id="supplier-data-import-form" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" id="supplier-data-import" name="data-file" style="display:none" />
+                    </form>
+                    <button id="supplier-data-import-btn" class="btn btn-grey">Choose a file</button>
+                </div>
+                <br>
+                <div class="progress">
+                    <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25"
+                        aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+                <div id='file-upload-loader' style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <strong class="text-info">Loading...</strong>
+                        <div class="spinner-border ms-auto spinner-border-sm text-info" role="status"
+                            aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <br>
+                <h5><strong>**Attention**</strong></h5>
+                <h6>Please download a file format to import data</h6>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-5">
+                        <div class="row" style="margin-right: 1px;">
+                            <button id="csv-import-example" class="btn btn-outline-info btn-sm" type="button"
+                                name="button" style="margin-bottom: 2px;">CSV - Radio Logs</button>
+                            <button id="excel-import-example" class="btn btn-outline-info btn-sm" type="button"
+                                name="button">XLSX - Radio Logs</button>
                         </div>
                     </div>
                     <div class="col-md-5">
@@ -225,6 +385,7 @@
         plotJailPopulationData()
         plotAvgSpentTencode()
 
+        fetchSupplierName()
         $('#radio-log-tab').addClass('active')
     })
 
@@ -260,9 +421,18 @@
         $('#data-import').trigger('click');
     });
 
+    $('#supplier-data-import-btn').click(function () {
+        $('#supplier-data-import').trigger('click');
+    });
+
     $("#import-btn").click(function () {
         $("#upload-data-modal").modal('show')
     })
+
+    $("#import-supplier-data-btn").click(function () {
+        $("#upload-supplier-data-modal").modal('show')
+    })
+
     // Unit shift selection button click
     $('.unit-shift-btn').click(function () {
         var unitShiftList = []
@@ -433,6 +603,62 @@
                         alert('Data upload failed! Please check the format.')
                         $("#progress-bar").attr("aria-valuenow", 0).css("width", 0 + "%").text(0 + "%");
                         $("#upload-data-modal").modal('hide');
+
+                    }
+                }
+            },
+            cache: false,
+            processData: false,
+            contentType: false,
+        })
+    })
+
+    $('#supplier-data-import-form').change(function (e) {
+        e.preventDefault();
+        var dataFile = new FormData($('#supplier-data-import-form').get(0));
+        dataFile.append('data-file', $('#supplier-data-import')[0].files);
+        $('#file-upload-loader').show();
+        $.ajax({
+            url: '{% url "visualisation:supplier-data-upload" %}',
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function (ev) {
+                    if (ev.lengthComputable) {
+                        console.log('Bytes Loaded: ' + ev.loaded);
+                        console.log('Total Size: ' + ev.total);
+                        console.log('Percentage Loaded: ' + (ev.loaded / ev.total) * 100 + '%');
+
+                        var percent = Math.round((ev.loaded / ev.total) * 100);
+                        $("#progress-bar").attr("aria-valuenow", percent).css("width", percent + "%").text(percent + "%");
+                    }
+                });
+                return xhr;
+            },
+            type: 'POST',
+            // headers: {
+            //     "X-CSRFToken": '{{ csrf_token }}'
+            // },
+            data: dataFile,
+            dataType: 'json',
+            success: function (data) {
+
+                // Reset input form
+                $('#supplier-data-import-form').each(function () {
+                    this.reset();
+                });
+                if (data) {
+                    $('#file-upload-loader').hide();
+                    if (data.status === 201) {
+                        setTimeout(function () {
+                            alert('Data successfully uploaded!');
+                        }, 500);
+                        $("#progress-bar").attr("aria-valuenow", 0).css("width", 0 + "%").text(0 + "%");
+                        $("#upload-data-modal").modal('hide');
+
+                    } else if (data.status === 403) {
+                        alert('Data upload failed! Please check the format.')
+                        $("#progress-bar").attr("aria-valuenow", 0).css("width", 0 + "%").text(0 + "%");
+                        $("#upload-supplier-data-modal").modal('hide');
 
                     }
                 }
@@ -616,5 +842,55 @@
             }
         })
     }
+
+    function fetchSupplierName() {
+        var clientId = '{{ client_id }}'
+        $.ajax({
+            url: '{% url "visualisation:fetch-supplier-name" %}',
+            type: 'GET',
+            data: {
+                'client_id': clientId
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.length > 0) {
+                    for (let i = 0; i < data.length; i++) {
+                        $("select[name=supplier-name-select]").append(`<option value="${data[i].id}">${data[i].supplier_name}</option>`)
+                    }
+                }
+            }
+        })
+    }
+
+    $('select[name=supplier-name-select]').change(function () {
+        var supplierName = $("select[name=supplier-name-select] option:selected").text()
+        console.log(supplierName);
+        $('#supplier-name').html(supplierName)
+        $.ajax({
+            url: '{% url "visualisation:fetch-supplier-data" %}',
+            type: 'GET',
+            data: {
+                'supplier_name': supplierName
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.length > 0) {
+                    $("#supplier-data").empty()
+                    $("#no-data-available").hide()
+                    for (let i = 0; i < data.length; i++) {
+                        console.log(data[i]);
+                        $("#supplier-data").append(
+                            `<tr>
+                                <td>${data[i].paid_year}</td>
+                                <td>${data[i].total_net_amount}</td>
+                                <td>${data[i].rank}</td>
+                                <td>${data[i].bin}</td>
+                            </tr>`
+                        )
+                    }
+                }
+            }
+        })
+    })
 </script>
 {% endblock javascripts %}
